@@ -138,9 +138,11 @@ public class DirectionHeatmapPanel extends JPanel {
         g2.rotate(Math.PI / 2);
 
         g2.setColor(Color.GREEN.darker());
-        drawMarker(g2, incidenceAz, incidenceEl, margin, plotWidth, plotHeight);
+        drawMarker(g2, incidenceAz, incidenceEl, margin, plotWidth, plotHeight,
+                azMin, azMax, elMin, elMax);
         g2.setColor(Color.RED.darker());
-        drawMarker(g2, scatterAz, scatterEl, margin, plotWidth, plotHeight);
+        drawMarker(g2, scatterAz, scatterEl, margin, plotWidth, plotHeight,
+                azMin, azMax, elMin, elMax);
     }
 
     private String formatTick(double value) {
@@ -153,15 +155,12 @@ public class DirectionHeatmapPanel extends JPanel {
         return String.format("%.2f", value);
     }
 
-    private void drawMarker(Graphics2D g2, Double azDeg, Double elDeg, int margin, int plotWidth, int plotHeight) {
+    private void drawMarker(Graphics2D g2, Double azDeg, Double elDeg, int margin,
+                            int plotWidth, int plotHeight,
+                            double azMin, double azMax, double elMin, double elMax) {
         if (azDeg == null || elDeg == null) {
             return;
         }
-        double azMin = azimuthsDeg[0];
-        double azMax = azimuthsDeg[azimuthsDeg.length - 1];
-        double elMin = elevationsDeg[0];
-        double elMax = elevationsDeg[elevationsDeg.length - 1];
-
         int x = valueToX(azDeg, azMin, azMax, margin, plotWidth);
         int y = valueToY(elDeg, elMin, elMax, margin, plotHeight);
         g2.drawOval(x - 5, y - 5, 10, 10);
