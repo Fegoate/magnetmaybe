@@ -50,10 +50,30 @@ public class RcsLineChartPanel extends JPanel {
             maxRcs = minRcs + 1.0;
         }
 
+        FontMetrics fm = g2.getFontMetrics();
+        int tickCount = 4;
+
         g2.setColor(Color.LIGHT_GRAY);
-        for (int i = 0; i <= 4; i++) {
-            int y = margin + i * plotHeight / 4;
+        for (int i = 0; i <= tickCount; i++) {
+            int y = margin + i * plotHeight / tickCount;
             g2.drawLine(margin, y, margin + plotWidth, y);
+        }
+
+        g2.setColor(Color.GRAY);
+        for (int i = 0; i <= tickCount; i++) {
+            double rcsTick = minRcs + (maxRcs - minRcs) * i / tickCount;
+            int y = margin + plotHeight - (int) ((rcsTick - minRcs) / (maxRcs - minRcs) * plotHeight);
+            g2.drawLine(margin - 4, y, margin, y);
+            String label = formatTick(rcsTick);
+            g2.drawString(label, margin - 8 - fm.stringWidth(label), y + fm.getAscent() / 2 - 2);
+        }
+
+        for (int i = 0; i <= tickCount; i++) {
+            double freqTick = minFreq + (maxFreq - minFreq) * i / tickCount;
+            int x = margin + (int) ((freqTick - minFreq) / (maxFreq - minFreq) * plotWidth);
+            g2.drawLine(x, margin + plotHeight, x, margin + plotHeight + 4);
+            String label = formatTick(freqTick);
+            g2.drawString(label, x - fm.stringWidth(label) / 2, margin + plotHeight + fm.getAscent() + 6);
         }
 
         g2.setColor(Color.BLUE);
@@ -74,12 +94,21 @@ public class RcsLineChartPanel extends JPanel {
         }
 
         g2.setColor(Color.DARK_GRAY);
-        FontMetrics fm = g2.getFontMetrics();
         String xLabel = "频率 (GHz)";
         String yLabel = "RCS (dBsm)";
         g2.drawString(xLabel, width / 2 - fm.stringWidth(xLabel) / 2, height - 8);
         g2.rotate(-Math.PI / 2);
         g2.drawString(yLabel, -height / 2 - fm.stringWidth(yLabel) / 2, 16);
         g2.rotate(Math.PI / 2);
+    }
+
+    private String formatTick(double value) {
+        double abs = Math.abs(value);
+        if (abs >= 100) {
+            return String.format("%.0f", value);
+        } else if (abs >= 10) {
+            return String.format("%.1f", value);
+        }
+        return String.format("%.2f", value);
     }
 }

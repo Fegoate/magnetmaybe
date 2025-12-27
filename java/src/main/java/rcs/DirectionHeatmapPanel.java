@@ -75,6 +75,35 @@ public class DirectionHeatmapPanel extends JPanel {
 
         g2.setColor(Color.BLACK);
         FontMetrics fm = g2.getFontMetrics();
+        int tickCount = 4;
+
+        double azMin = azimuthsDeg[0];
+        double azMax = azimuthsDeg[azimuthsDeg.length - 1];
+        double elMin = elevationsDeg[0];
+        double elMax = elevationsDeg[elevationsDeg.length - 1];
+        if (azMax == azMin) {
+            azMax = azMin + 1.0;
+        }
+        if (elMax == elMin) {
+            elMax = elMin + 1.0;
+        }
+
+        for (int i = 0; i <= tickCount; i++) {
+            double azTick = azMin + (azMax - azMin) * i / tickCount;
+            int x = margin + (int) ((azTick - azMin) / (azMax - azMin) * plotWidth);
+            g2.drawLine(x, margin + plotHeight, x, margin + plotHeight + 4);
+            String label = formatTick(azTick);
+            g2.drawString(label, x - fm.stringWidth(label) / 2, margin + plotHeight + fm.getAscent() + 6);
+        }
+
+        for (int i = 0; i <= tickCount; i++) {
+            double elTick = elMin + (elMax - elMin) * i / tickCount;
+            int y = margin + plotHeight - (int) ((elTick - elMin) / (elMax - elMin) * plotHeight);
+            g2.drawLine(margin - 4, y, margin, y);
+            String label = formatTick(elTick);
+            g2.drawString(label, margin - 8 - fm.stringWidth(label), y + fm.getAscent() / 2 - 2);
+        }
+
         String xLabel = "散射方位角 (deg)";
         String yLabel = "散射俯仰角 (deg)";
         g2.drawString(xLabel, width / 2 - fm.stringWidth(xLabel) / 2, height - 8);
@@ -86,6 +115,16 @@ public class DirectionHeatmapPanel extends JPanel {
         drawMarker(g2, incidenceAz, incidenceEl, margin, plotWidth, plotHeight);
         g2.setColor(Color.RED.darker());
         drawMarker(g2, scatterAz, scatterEl, margin, plotWidth, plotHeight);
+    }
+
+    private String formatTick(double value) {
+        double abs = Math.abs(value);
+        if (abs >= 100) {
+            return String.format("%.0f", value);
+        } else if (abs >= 10) {
+            return String.format("%.1f", value);
+        }
+        return String.format("%.2f", value);
     }
 
     private void drawMarker(Graphics2D g2, Double azDeg, Double elDeg, int margin, int plotWidth, int plotHeight) {
