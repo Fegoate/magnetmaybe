@@ -40,6 +40,17 @@ public class DirectionHeatmapPanel extends JPanel {
         int plotWidth = width - 2 * margin;
         int plotHeight = height - 2 * margin;
 
+        double azMin = azimuthsDeg[0];
+        double azMax = azimuthsDeg[azimuthsDeg.length - 1];
+        double elMin = elevationsDeg[0];
+        double elMax = elevationsDeg[elevationsDeg.length - 1];
+        if (azMax == azMin) {
+            azMax = azMin + 1.0;
+        }
+        if (elMax == elMin) {
+            elMax = elMin + 1.0;
+        }
+
         g2.setColor(Color.WHITE);
         g2.fillRect(0, 0, width, height);
         g2.setColor(Color.GRAY);
