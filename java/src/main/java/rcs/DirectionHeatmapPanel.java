@@ -56,14 +56,31 @@ public class DirectionHeatmapPanel extends JPanel {
         g2.setColor(Color.GRAY);
         g2.drawRect(margin, margin, plotWidth, plotHeight);
 
-        if (azimuthsDeg.length == 0 || elevationsDeg.length == 0) {
+        if (azimuthsDeg.length == 0 || elevationsDeg.length == 0
+                || rcsValues.length == 0 || rcsValues[0].length == 0) {
             return;
+        }
+
+        double azMin = azimuthsDeg[0];
+        double azMax = azimuthsDeg[azimuthsDeg.length - 1];
+        double elMin = elevationsDeg[0];
+        double elMax = elevationsDeg[elevationsDeg.length - 1];
+        if (azMax == azMin) {
+            azMax = azMin + 1.0;
+        }
+        if (elMax == elMin) {
+            elMax = elMin + 1.0;
         }
 
         double minRcs = Double.POSITIVE_INFINITY;
         double maxRcs = Double.NEGATIVE_INFINITY;
-        for (double[] row : rcsValues) {
-            for (double v : row) {
+        int rows = Math.min(elevationsDeg.length, rcsValues.length);
+        int cols = Math.min(azimuthsDeg.length, rcsValues[0].length);
+        for (int i = 0; i < rows; i++) {
+            double[] row = rcsValues[i];
+            int limit = Math.min(cols, row.length);
+            for (int j = 0; j < limit; j++) {
+                double v = row[j];
                 minRcs = Math.min(minRcs, v);
                 maxRcs = Math.max(maxRcs, v);
             }
@@ -72,9 +89,11 @@ public class DirectionHeatmapPanel extends JPanel {
 
         double[] azBounds = computeBounds(azimuthsDeg);
         double[] elBounds = computeBounds(elevationsDeg);
-        for (int i = 0; i < elevationsDeg.length; i++) {
-            for (int j = 0; j < azimuthsDeg.length; j++) {
-                double v = rcsValues[i][j];
+        for (int i = 0; i < rows; i++) {
+            double[] row = rcsValues[i];
+            int limit = Math.min(cols, row.length);
+            for (int j = 0; j < limit; j++) {
+                double v = row[j];
                 float t = (float) ((v - minRcs) / scale);
                 Color c = new Color(t, 0.2f, 1.0f - t);
                 g2.setColor(c);
